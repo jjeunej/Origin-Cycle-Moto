@@ -1,0 +1,325 @@
+body {
+    font-family: 'Segoe UI';
+    padding-top: 80px;
+    min-height: 100vh;
+
+    background-image: url('../img/Background_acceuil.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: #ffffff;
+}
+
+/* OVERLAY */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* CONTENU AU DESSUS DE L'OVERLAY */
+body > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* TEXTE VISIBLE */
+h1, h2, h3, h4, h5, h6, p, label, span {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* NAVBAR */
+.navbar {
+    background: rgba(123, 63, 63, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 15px 0;
+    z-index: 999;
+}
+
+/* LOGO */
+.navbar-brand {
+    color: #ffffff !important;
+    font-weight: bold;
+}
+
+.navbar-brand span {
+    color: #ff3c3c;
+}
+
+/* NAV LINKS */
+.navbar .nav-link {
+    color: #ffffff !important;
+    font-weight: 500;
+    position: relative;
+    padding-bottom: 5px;
+    transition: 0.3s;
+}
+
+/* LIGNE ANIMÉE */
+.navbar .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background: #ff3c3c;
+    transition: width 0.3s ease;
+}
+
+/* HOVER NAV */
+.navbar .nav-link:hover {
+    color: #ff3c3c !important;
+}
+
+.navbar .nav-link:hover::after {
+    width: 100%;
+}
+
+/* LIEN ACTIF */
+.navbar .nav-link.active {
+    color: #ff3c3c !important;
+}
+
+/* HERO */
+.hero-img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+/* TYPOGRAPHIE */
+h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.2;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+}
+
+h2 {
+    font-weight: 700;
+    text-shadow: 1px 1px 6px rgba(0,0,0,0.5);
+}
+
+p {
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.text-highlight {
+    color: #ff3c3c !important;
+}
+
+/* BOUTONS */
+.btn {
+    border-radius: 25px;
+    padding: 10px 25px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #ff3c3c;
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #cc0000;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 60, 60, 0.4);
+}
+
+.btn-outline-light {
+    border: 2px solid white;
+    color: white;
+}
+
+.btn-outline-light:hover {
+    background: white;
+    color: #ff3c3c;
+    transform: translateY(-2px);
+}
+
+/* CAROUSEL IMAGE */
+.carousel-img {
+    height: 550px;
+    width: 100%;
+    object-fit: contain;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    transition: 0.5s;
+    display: block;
+}
+
+/* WRAPPER POUR L'EFFET SHINE */
+.carousel-img-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+}
+
+/* L'EFFET DE BRILLANCE */
+.carousel-img-wrapper::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -75%;
+    width: 50%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.25);
+    transform: skewX(-20deg);
+    transition: 0.7s ease;
+    opacity: 0;
+}
+
+/* ACTIVATION AU HOVER */
+.carousel-img-wrapper:hover::after {
+    left: 130%;
+    opacity: 1;
+}
+
+.carousel-img:hover {
+    transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.05);
+}
+
+/* CAROUSEL BOX */
+.brand-carousel-box {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 40px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: #ff3c3c;
+    border-radius: 50%;
+    padding: 20px;
+}
+
+/* CARTES */
+.card {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 40px rgba(255, 60, 60, 0.2);
+    border-color: rgba(255, 60, 60, 0.4) !important;
+}
+
+.card-title {
+    color: #ffffff !important;
+    font-weight: 700;
+}
+
+.card-text {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* IMAGES CARTES */
+.card img {
+    height: 220px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* TEXTE PRIX */
+.price {
+    color: #ff3c3c;
+    font-weight: bold;
+}
+
+/* FOOTER */
+footer {
+    background: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 60, 60, 0.3);
+    color: rgba(255, 255, 255, 0.8) !important;
+    padding: 40px 0 20px;
+}
+
+footer a {
+    color: rgba(255, 255, 255, 0.7) !important;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+footer a:hover {
+    color: #ff3c3c !important;
+}
+/* ENGAGEMENTS MISSION */
+.mission-engage {
+    background: rgba(255, 60, 60, 0.08);
+    border: 1px solid rgba(255, 60, 60, 0.25);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.mission-engage:hover {
+    background: rgba(255, 60, 60, 0.15);
+    transform: translateY(-3px);
+}
+
+.mission-engage i {
+    color: #ff3c3c;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.mission-engage p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.85) !important;
+    text-shadow: none !important;
+}
+
+/* CHIFFRES CLÉS */
+.mission-stat {
+    background: rgba(255, 60, 60, 0.1);
+    border: 1px solid rgba(255, 60, 60, 0.3);
+    border-radius: 12px;
+    padding: 15px 10px;
+    transition: all 0.3s ease;
+}
+
+.mission-stat:hover {
+    background: rgba(255, 60, 60, 0.2);
+    transform: translateY(-3px);
+}
+
+.mission-stat h3 {
+    color: #ff3c3c !important;
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.mission-stat p {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.7) !important;
+    margin: 0;
+    text-shadow: none !important;
+}
