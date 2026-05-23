@@ -147,12 +147,24 @@ function afficherMotos(page) {
         container.innerHTML += `
         <div class="col-md-4 mb-4">
             <div class="card shadow">
-                <img src="${moto.img}" class="card-img-top">
+                <img src="${moto.img}" class="card-img-top" style="height:220px;object-fit:cover;">
                 <div class="card-body text-center">
                     <h5>${moto.nom}</h5>
-                    <p>${moto.marque}</p>
-                    <p class="fw-bold">${moto.prix}</p>
-                    <a href="contact.html" class="btn btn-outline-light">Voir détails</a>
+                    <p class="text-muted mb-1">${moto.marque}</p>
+                    <p class="fw-bold text-danger mb-3">${moto.prix}</p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <a href="contact.html" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-info-circle me-1"></i>Détails
+                        </a>
+                        <button class="btn btn-danger btn-sm"
+                            data-nom="${moto.nom}"
+                            data-prix="${moto.prix}"
+                            data-marque="${moto.marque}"
+                            data-img="${moto.img}"
+                            onclick="ajouterAuPanierDepuisCard(this)">
+                            <i class="bi bi-cart-plus me-1"></i>Panier
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

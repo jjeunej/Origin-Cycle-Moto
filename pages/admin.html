@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin – Commandes | ORIGINE CYCLE-MOTO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top scrolled">
+    <div class="container">
+        <a class="navbar-brand" href="../index.html">
+            ORIGINE <span>CYCLE-MØTO</span>
+            <span class="badge bg-danger ms-2" style="font-size:0.7rem;vertical-align:middle;">ADMIN</span>
+        </a>
+        <div class="ms-auto d-flex gap-2 align-items-center">
+            <button class="theme-toggle" id="themeToggle"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
+            <!-- nav-user sera injecté par auth.js -->
+            <a href="login.html" class="btn text-white ms-1" style="background:none;border:none;" id="nav-user" title="Compte">
+                <i class="bi bi-person-circle fs-5"></i>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<section class="container py-5 mt-5">
+
+    <!-- TABLEAU DES COMMANDES -->
+    <div id="admin-panel">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <h2 class="mb-0"><i class="bi bi-list-ul me-2"></i>Toutes les commandes</h2>
+            <div class="d-flex gap-2 align-items-center">
+                <span class="badge bg-secondary fs-6" id="admin-count">0 commande(s)</span>
+                <button class="btn btn-sm btn-outline-light" onclick="exporterCommandes()">
+                    <i class="bi bi-download me-1"></i>Exporter JSON
+                </button>
+            </div>
+        </div>
+
+        <!-- FILTRES PAR STATUT -->
+        <div class="d-flex flex-wrap gap-2 mb-4" id="filtres-statut"></div>
+
+        <!-- TABLEAU -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>N° commande</th>
+                        <th>Date</th>
+                        <th>Client</th>
+                        <th>Téléphone</th>
+                        <th>Ville</th>
+                        <th>Articles</th>
+                        <th>Total</th>
+                        <th>Statut</th>
+                        <th style="min-width:170px;">Modifier statut</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-tbody"></tbody>
+            </table>
+        </div>
+        <p id="admin-vide" class="text-center text-muted py-5 d-none">
+            <i class="bi bi-inbox fs-1 d-block mb-3"></i>Aucune commande pour le moment.
+        </p>
+    </div>
+
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/panier.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/commandes.js"></script>
+<script src="../js/email.js"></script>
+<script>
+    // Vérification auth admin au chargement (avant le DOMContentLoaded de auth.js)
+    window.addEventListener('load', () => {
+        if (!estConnecte()) {
+            window.location.href = 'login.html';
+            return;
+        }
+        if (!estAdmin()) {
+            alert("Accès refusé. Cette page est réservée à l'administrateur.");
+            window.location.href = '../index.html';
+            return;
+        }
+        renderFiltres();
+        renderCommandes();
+    });
+
+    let filtreActif = '';
+
+    function renderFiltres() {
+        const container = document.getElementById('filtres-statut');
+        container.innerHTML = '';
+        const tous = document.createElement('button');
+        tous.className = 'btn btn-sm btn-danger';
+        tous.textContent = 'Tous';
+        tous.onclick = function() { filtrerStatut('', this); };
+        container.appendChild(tous);
+
+        STATUTS.forEach(s => {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-sm btn-outline-light';
+            btn.textContent = s;
+            btn.onclick = function() { filtrerStatut(s, this); };
+            container.appendChild(btn);
+        });
+    }
+
+    function filtrerStatut(statut, btn) {
+        filtreActif = statut;
+        document.querySelectorAll('#filtres-statut .btn').forEach(b => {
+            b.className = 'btn btn-sm btn-outline-light';
+        });
+        btn.className = 'btn btn-sm btn-danger';
+        renderCommandes();
+    }
+
+    function renderCommandes() {
+        let commandes = getCommandes();
+        if (filtreActif) commandes = commandes.filter(c => c.statut === filtreActif);
+        commandes.sort((a, b) => new Date(b.dateISO) - new Date(a.dateISO));
+
+        const tbody = document.getElementById('admin-tbody');
+        const vide  = document.getElementById('admin-vide');
+        document.getElementById('admin-count').textContent = `${commandes.length} commande(s)`;
+
+        if (!commandes.length) {
+            tbody.innerHTML = '';
+            vide.classList.remove('d-none');
+            return;
+        }
+        vide.classList.add('d-none');
+
+        tbody.innerHTML = commandes.map(cmd => {
+            const articles = cmd.articles.map(a => `${a.nom} ×${a.quantite}`).join('<br>');
+            const options  = STATUTS.map(s =>
+                `<option value="${s}" ${s === cmd.statut ? 'selected' : ''}>${s}</option>`
+            ).join('');
+            return `
+            <tr>
+                <td><code class="text-danger fw-bold">${cmd.numero}</code></td>
+                <td class="small text-muted">${cmd.date}</td>
+                <td>
+                    <div class="fw-semibold">${cmd.client.prenom} ${cmd.client.nom}</div>
+                    <small class="text-muted">${cmd.client.email}</small>
+                </td>
+                <td class="small">${cmd.client.tel}</td>
+                <td class="small">${cmd.client.ville}</td>
+                <td class="small">${articles}</td>
+                <td class="fw-bold text-danger small">${formatPrix(cmd.total)}</td>
+                <td>${badgeStatut(cmd.statut)}</td>
+                <td>
+                    <select class="form-select form-select-sm mb-1" id="sel-${cmd.numero}">
+                        ${options}
+                    </select>
+                    <button class="btn btn-danger btn-sm w-100"
+                            onclick="sauvegarderStatut('${cmd.numero}')">
+                        <i class="bi bi-send me-1"></i>Sauver + notifier
+                    </button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    async function sauvegarderStatut(numero) {
+        const sel = document.getElementById(`sel-${numero}`);
+        if (!sel) return;
+        const nouveauStatut = sel.value;
+
+        mettreAJourStatut(numero, nouveauStatut);
+        renderCommandes();
+
+        // Récupère la commande mise à jour et envoie un email au client
+        const commande = getCommandeParNumero(numero);
+        if (commande) {
+            afficherToast(`Statut mis à jour : ${nouveauStatut}`);
+            await envoyerEmailStatut(commande);
+        }
+    }
+
+    function exporterCommandes() {
+        const data = JSON.stringify(getCommandes(), null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'commandes-ocm-' + new Date().toISOString().slice(0, 10) + '.json';
+        a.click();
+    }
+
+    // Thème
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon   = document.getElementById('themeIcon');
+    const html        = document.documentElement;
+    const savedTheme  = localStorage.getItem('theme');
+    if (savedTheme) { html.setAttribute('data-bs-theme', savedTheme); themeIcon.className = savedTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill'; }
+    themeToggle.addEventListener('click', () => {
+        const t = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-bs-theme', t);
+        localStorage.setItem('theme', t);
+        themeIcon.className = t === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+    });
+</script>
+</body>
+</html>

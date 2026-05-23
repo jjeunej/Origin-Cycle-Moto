@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion | ORIGINE CYCLE-MOTO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top scrolled">
+    <div class="container">
+        <a class="navbar-brand" href="../index.html">ORIGINE <span>CYCLE-MØTO</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto me-4">
+                <li class="nav-item"><a class="nav-link" href="../index.html">Accueil</a></li>
+                <li class="nav-item"><a class="nav-link" href="../about.html">A propos</a></li>
+                <li class="nav-item"><a class="nav-link" href="../services.html">Services</a></li>
+                <li class="nav-item"><a class="nav-link" href="../projects.html">Motos</a></li>
+                <li class="nav-item"><a class="nav-link" href="../contact.html">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
+            <a href="panier.html" class="btn position-relative text-white ms-2" style="background:none;border:none;" title="Panier">
+                <i class="bi bi-cart3 fs-5"></i>
+                <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.65rem;display:none;">0</span>
+            </a>
+            <a href="login.html" class="btn text-white ms-1" style="background:none;border:none;" id="nav-user" title="Connexion">
+                <i class="bi bi-person-circle fs-5"></i>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- CONTENU -->
+<section class="container py-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+
+            <div class="card p-4 shadow-lg">
+                <h2 class="text-center mb-4">Mon compte</h2>
+
+                <!-- ONGLETS -->
+                <ul class="nav nav-pills nav-fill mb-4" id="authTabs">
+                    <li class="nav-item">
+                        <button class="nav-link active" id="tab-login" onclick="showTab('login')">Connexion</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="tab-register" onclick="showTab('register')">Inscription</button>
+                    </li>
+                </ul>
+
+                <!-- ALERTE -->
+                <div id="auth-alert" class="alert d-none" role="alert"></div>
+
+                <!-- FORMULAIRE CONNEXION -->
+                <form id="form-login" onsubmit="handleLogin(event)">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="login-email" required placeholder="exemple@mail.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" class="form-control" id="login-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100 fw-bold">Se connecter</button>
+                </form>
+
+                <!-- FORMULAIRE INSCRIPTION -->
+                <form id="form-register" class="d-none" onsubmit="handleRegister(event)">
+                    <div class="mb-3">
+                        <label class="form-label">Nom complet</label>
+                        <input type="text" class="form-control" id="reg-nom" required placeholder="Jean Dupont">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="reg-email" required placeholder="exemple@mail.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" class="form-control" id="reg-password" required placeholder="Min. 6 caractères" minlength="6">
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100 fw-bold">Créer mon compte</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/panier.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+    // Redirection si déjà connecté
+    if (estConnecte()) {
+        window.location.href = estAdmin() ? 'admin.html' : '../index.html';
+    }
+
+    function showTab(tab) {
+        document.getElementById('form-login').classList.toggle('d-none', tab !== 'login');
+        document.getElementById('form-register').classList.toggle('d-none', tab !== 'register');
+        document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+        document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+        document.getElementById('auth-alert').classList.add('d-none');
+    }
+
+    function showAlert(message, type = 'danger') {
+        const el = document.getElementById('auth-alert');
+        el.className = `alert alert-${type}`;
+        el.textContent = message;
+    }
+
+    function handleLogin(e) {
+        e.preventDefault();
+        const res = connecter(
+            document.getElementById('login-email').value,
+            document.getElementById('login-password').value
+        );
+        if (res.success) {
+            if (res.user.isAdmin) {
+                window.location.href = 'admin.html'; // admin → tableau de bord
+            } else {
+                window.location.href = getPanier().length ? 'panier.html' : '../index.html';
+            }
+        } else {
+            showAlert(res.message);
+        }
+    }
+
+    function handleRegister(e) {
+        e.preventDefault();
+        const res = inscrire(
+            document.getElementById('reg-nom').value,
+            document.getElementById('reg-email').value,
+            document.getElementById('reg-password').value
+        );
+        if (res.success) {
+            showAlert(`Bienvenue ${res.user.nom} ! Compte créé avec succès.`, 'success');
+            setTimeout(() => {
+                window.location.href = getPanier().length ? 'panier.html' : '../index.html';
+            }, 1200);
+        } else {
+            showAlert(res.message);
+        }
+    }
+
+    // Thème
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon   = document.getElementById('themeIcon');
+    const html        = document.documentElement;
+    const savedTheme  = localStorage.getItem('theme');
+    if (savedTheme) { html.setAttribute('data-bs-theme', savedTheme); themeIcon.className = savedTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill'; }
+    themeToggle.addEventListener('click', () => {
+        const t = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-bs-theme', t);
+        localStorage.setItem('theme', t);
+        themeIcon.className = t === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passer commande | ORIGINE CYCLE-MOTO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top scrolled">
+    <div class="container">
+        <a class="navbar-brand" href="../index.html">ORIGINE <span>CYCLE-MØTO</span></a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto me-4">
+                <li class="nav-item"><a class="nav-link" href="../projects.html">Motos</a></li>
+                <li class="nav-item"><a class="nav-link" href="panier.html">Panier</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
+            <a href="panier.html" class="btn position-relative text-white ms-2" style="background:none;border:none;" title="Panier">
+                <i class="bi bi-cart3 fs-5"></i>
+                <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.65rem;display:none;">0</span>
+            </a>
+            <a href="login.html" class="btn text-white ms-1" style="background:none;border:none;" id="nav-user" title="Connexion">
+                <i class="bi bi-person-circle fs-5"></i>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<section class="container py-5 mt-5">
+
+    <!-- ÉTAPES -->
+    <div class="d-flex justify-content-center mb-5 gap-0">
+        <div class="text-center px-3">
+            <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center" style="width:36px;height:36px;">
+                <i class="bi bi-cart-check text-white"></i>
+            </div>
+            <div class="small mt-1 text-muted">Panier</div>
+        </div>
+        <div class="align-self-start mt-2 flex-grow-1" style="max-width:60px;"><hr></div>
+        <div class="text-center px-3">
+            <div class="rounded-circle bg-danger d-inline-flex align-items-center justify-content-center" style="width:36px;height:36px;">
+                <i class="bi bi-file-text text-white"></i>
+            </div>
+            <div class="small mt-1 fw-bold">Commande</div>
+        </div>
+        <div class="align-self-start mt-2 flex-grow-1" style="max-width:60px;"><hr></div>
+        <div class="text-center px-3">
+            <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center" style="width:36px;height:36px;">
+                <i class="bi bi-check-circle text-white"></i>
+            </div>
+            <div class="small mt-1 text-muted">Confirmation</div>
+        </div>
+    </div>
+
+    <!-- FORMULAIRE + RÉSUMÉ -->
+    <div id="section-formulaire">
+        <div class="row g-4">
+
+            <!-- FORMULAIRE CLIENT -->
+            <div class="col-lg-7">
+                <div class="card p-4">
+                    <h4 class="mb-4"><i class="bi bi-person-lines-fill me-2"></i>Vos coordonnées</h4>
+                    <form id="form-commande" onsubmit="passerCommande(event)">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Prénom *</label>
+                                <input type="text" class="form-control" id="c-prenom" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Nom *</label>
+                                <input type="text" class="form-control" id="c-nom" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="c-email" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Téléphone *</label>
+                                <input type="tel" class="form-control" id="c-tel" required placeholder="+509 __ __ __ __">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Ville *</label>
+                                <input type="text" class="form-control" id="c-ville" required placeholder="Port-au-Prince">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Adresse de livraison *</label>
+                                <textarea class="form-control" id="c-adresse" rows="2" required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Notes (optionnel)</label>
+                                <textarea class="form-control" id="c-notes" rows="2" placeholder="Instructions spéciales..."></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100 mt-4 fw-bold py-2">
+                            <i class="bi bi-check2-circle me-2"></i>Confirmer la commande
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RÉSUMÉ PANIER -->
+            <div class="col-lg-5">
+                <div class="card p-4">
+                    <h5 class="mb-3"><i class="bi bi-receipt me-2"></i>Récapitulatif</h5>
+                    <div id="resume-articles"></div>
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold fs-5">
+                        <span>Total</span>
+                        <span class="text-danger" id="resume-total"></span>
+                    </div>
+                    <a href="panier.html" class="btn btn-outline-secondary btn-sm mt-3 w-100">
+                        <i class="bi bi-arrow-left me-1"></i>Modifier le panier
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRMATION (cachée au départ) -->
+    <div id="section-confirmation" class="d-none text-center py-4">
+        <div class="card p-5 mx-auto" style="max-width:520px;">
+            <div class="mb-3" style="font-size:4rem;color:#28a745;">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h3 class="fw-bold">Commande confirmée !</h3>
+            <p class="mt-2">Votre numéro de commande :</p>
+            <div class="bg-danger bg-opacity-10 border border-danger rounded p-3 my-3">
+                <span id="numero-commande" class="fs-4 fw-bold text-danger font-monospace"></span>
+            </div>
+            <p class="text-muted small">Conservez ce numéro pour suivre votre commande.</p>
+            <div class="d-flex gap-2 justify-content-center mt-3 flex-wrap">
+                <a href="suivi-commande.html" class="btn btn-danger">
+                    <i class="bi bi-truck me-2"></i>Suivre ma commande
+                </a>
+                <a href="../index.html" class="btn btn-outline-secondary">
+                    <i class="bi bi-house me-2"></i>Accueil
+                </a>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/panier.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/commandes.js"></script>
+<script src="../js/email.js"></script>
+<script>
+    function formatPrixLocal(n) {
+        return new Intl.NumberFormat('fr-FR').format(n) + ' HTG';
+    }
+
+    function renderResume() {
+        const panier = getPanier();
+        // Redirige si panier vide
+        if (!panier.length) { window.location.href = 'panier.html'; return; }
+
+        document.getElementById('resume-articles').innerHTML = panier.map(item => `
+            <div class="d-flex justify-content-between align-items-center mb-2 small">
+                <div class="d-flex align-items-center gap-2">
+                    <img src="../${item.img}" style="width:40px;height:30px;object-fit:cover;border-radius:5px;">
+                    <div>
+                        <div class="fw-semibold">${item.nom}</div>
+                        <div class="text-muted">x${item.quantite}</div>
+                    </div>
+                </div>
+                <span class="fw-bold">${formatPrixLocal(parsePrix(item.prix) * item.quantite)}</span>
+            </div>`).join('');
+
+        document.getElementById('resume-total').textContent = formatPrixLocal(calculerTotal());
+    }
+
+    // Pré-remplit si connecté
+    function preremplirForm() {
+        const user = getUtilisateur();
+        if (!user) return;
+        const parts = user.nom.split(' ');
+        document.getElementById('c-prenom').value = parts[0] || '';
+        document.getElementById('c-nom').value    = parts.slice(1).join(' ') || '';
+        document.getElementById('c-email').value  = user.email || '';
+    }
+
+    function passerCommande(e) {
+        e.preventDefault();
+        const client = {
+            prenom:  document.getElementById('c-prenom').value,
+            nom:     document.getElementById('c-nom').value,
+            email:   document.getElementById('c-email').value,
+            tel:     document.getElementById('c-tel').value,
+            ville:   document.getElementById('c-ville').value,
+            adresse: document.getElementById('c-adresse').value,
+            notes:   document.getElementById('c-notes').value
+        };
+        const commande = creerCommande(client);
+        if (!commande) { alert('Panier vide. Impossible de créer la commande.'); return; }
+
+        document.getElementById('section-formulaire').classList.add('d-none');
+        document.getElementById('section-confirmation').classList.remove('d-none');
+        document.getElementById('numero-commande').textContent = commande.numero;
+        afficherCompteurPanier();
+
+        // Envoi des emails (asynchrone, n'attend pas la réponse pour continuer)
+        envoyerEmailCommande(commande);
+    }
+
+    // Thème
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon   = document.getElementById('themeIcon');
+    const html        = document.documentElement;
+    const savedTheme  = localStorage.getItem('theme');
+    if (savedTheme) { html.setAttribute('data-bs-theme', savedTheme); themeIcon.className = savedTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill'; }
+    themeToggle.addEventListener('click', () => {
+        const t = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-bs-theme', t);
+        localStorage.setItem('theme', t);
+        themeIcon.className = t === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+    });
+
+    document.addEventListener('DOMContentLoaded', () => { renderResume(); preremplirForm(); });
+</script>
+</body>
+</html>
