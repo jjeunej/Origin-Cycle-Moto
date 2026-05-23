@@ -1,39 +1,89 @@
-# ORIGINE CYCLE-MØTO 🏍️
+# 🏍️ ORIGINE CYCLE-MØTO
 
-**ORIGINE CYCLE-MØTO** est une plateforme professionnelle dédiée à la vente de motocyclettes en Haïti. Nous nous engageons à fournir des solutions de mobilité fiables, économiques et adaptées aux réalités locales pour les particuliers et les professionnels.
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 
-## 🌟 À Propos
-Depuis plus de 5 ans, nous accompagnons nos clients dans l'acquisition de véhicules performants. Notre mission est de faciliter l'accès à un transport abordable tout en garantissant une qualité premium à travers nos partenariats avec des marques de renommée mondiale.
-
-## 🚀 Fonctionnalités Clés
-- **Catalogue complet** : Une large gamme de motos (PIAGGIO, HERO, HAOJIN, LINKENG).
-- **Services sur mesure** : Conseil personnalisé pour choisir la moto idéale selon vos besoins.
-- **Support technique** : Service après-vente (SAV) fiable et disponibilité des pièces de rechange d'origine.
-- **Logistique** : Système de livraison rapide et sécurisé à travers les 10 départements d'Haïti.
-- **Accessibilité** : Solutions de paiement flexibles pour faciliter votre achat.
-
-## 🛠️ Technologies Utilisées
-Ce projet est construit avec des technologies web modernes pour assurer une expérience utilisateur fluide et réactive :
-- **HTML5** : Structure sémantique du contenu.
-- **CSS3 & Bootstrap 5** : Design moderne, animations et adaptabilité mobile (Responsive Design).
-- **JavaScript** : Interactions dynamiques et gestion de l'interface utilisateur.
-- **Bootstrap Icons** : Bibliothèque d'icônes professionnelles.
-
-## 📂 Structure du Projet
-- `index.html` : Page d'accueil avec présentation des points forts et des marques.
-- `about.html` : Notre mission, nos engagements et notre expérience.
-- `services.html` : Détails de nos offres (vente, SAV, pièces, etc.).
-- `projects.html` : Catalogue interactif des modèles disponibles.
-- `contact.html` : Formulaire de contact et informations de localisation.
-- `css/` : Feuilles de style personnalisées.
-- `js/` : Scripts pour le fonctionnement du site.
-- `img/` : Ressources visuelles et photos des motos.
-
-## 📞 Contactez-nous
-Vous avez une question ou souhaitez passer commande ?
-- 📍 **Adresse** : No.1 Boulevard 15 Octobre, Tabarre, Haïti.
-- 📧 **Email** : [jjeune2205@gmail.com](mailto:jjeune2205@gmail.com)
-- 📞 **Téléphone** : +509 3792 3316
+**ORIGINE CYCLE-MØTO** est la plateforme de référence pour l'acquisition de motocyclettes de haute qualité en Haïti. Alliant performance, économie et fiabilité, nous transformons la mobilité urbaine et rurale à travers le pays.
 
 ---
-*© 2026 ORIGINE CYCLE-MØTO - La route commence ici.*
+
+## 📋 Sommaire
+- [À Propos](#-à-propos)
+- [Fonctionnalités Clés](#-fonctionnalités-clés)
+- [Marques Partenaires](#-marques-partenaires)
+- [Technologies](#-technologies)
+- [Installation et Aperçu](#-installation-et-aperçu)
+- [Structure du Projet](#-structure-du-projet)
+- [Contact](#-contact)
+
+---
+
+## 🌟 À Propos
+Fort de plus de 5 ans d'expertise sur le marché haïtien, **ORIGINE CYCLE-MØTO** s'est imposé comme un leader de confiance. Notre mission est simple : offrir des véhicules robustes adaptés aux routes d'Haïti tout en assurant un service client d'exception.
+
+Nous ne vendons pas seulement des motos ; nous offrons des solutions de transport durables pour les entrepreneurs, les professionnels et les particuliers.
+
+## 🚀 Fonctionnalités Clés
+- **Catalogue Dynamique** : Une sélection rigoureuse de modèles adaptés à tous les budgets.
+- **Expérience Utilisateur (UX) Fluide** : Interface moderne avec mode sombre intégré et navigation intuitive.
+- **Gestion de Panier** : Système de sélection de produits interactif.
+- **Service Après-Vente (SAV)** : Engagement sur la disponibilité des pièces de rechange d'origine.
+- **Couverture Nationale** : Livraison sécurisée dans les 10 départements géographiques.
+
+## 🏁 Marques Partenaires
+Nous sommes fiers de collaborer avec les constructeurs les plus fiables du marché :
+- **PIAGGIO** : L'élégance et la robustesse italienne.
+- **HERO** : La performance technologique mondiale.
+- **HAOJIN** : Le meilleur rapport qualité/prix.
+- **LINKENG** : La durabilité éprouvée.
+
+## 🛠️ Technologies
+Le projet utilise une pile technologique moderne pour garantir rapidité et compatibilité mobile :
+- **Frontend** : HTML5 sémantique, CSS3 (Custom Properties), Bootstrap 5.
+- **Interactivité** : Vanilla JavaScript (ES6+).
+- **Design** : Bootstrap Icons, Google Fonts (Segoe UI), animations fluides.
+- **Architecture** : Design Responsive "Mobile-First".
+
+## 💻 Installation et Aperçu
+
+Pour visualiser le projet localement :
+
+1.  **Cloner le dépôt** :
+    ```bash
+    git clone https://github.com/votre-utilisateur/origine-cycle-moto.git
+    ```
+2.  **Accéder au répertoire** :
+    ```bash
+    cd origine-cycle-moto
+    ```
+3.  **Lancer le fichier principal** :
+    Ouvrez simplement `index.html` dans votre navigateur préféré.
+
+> *Note : Aucun serveur backend n'est requis pour la version de démonstration actuelle.*
+
+## 📂 Structure du Projet
+```text
+.
+├── index.html          # Page d'accueil (Hero, Marques, Footer)
+├── about.html          # Histoire et vision de l'entreprise
+├── services.html       # Offres détaillées (Vente, SAV, Pièces)
+├── projects.html       # Catalogue complet des motos
+├── contact.html        # Point de contact et localisation
+├── css/                # Feuilles de style personnalisées
+├── js/                 # Logique JavaScript (Panier, Thème, Config)
+├── img/                # Galerie d'images et assets visuels
+└── pages/              # Pages secondaires (Panier, Login, Suivi)
+```
+
+## 📞 Contact
+Vous souhaitez une consultation personnalisée ou passer une commande ?
+
+- 📍 **Localisation** : No.1 Boulevard 15 Octobre, Tabarre, Haïti.
+- 📧 **Email** : [jjeune2205@gmail.com](mailto:jjeune2205@gmail.com)
+- 📞 **Téléphone** : +509 3792 3316
+- 🌐 **Web** : [www.originecyclemoto.ht](http://www.originecyclemoto.ht)
+
+---
+*© 2026 ORIGINE CYCLE-MØTO - Propulser l'avenir de la mobilité en Haïti.*
