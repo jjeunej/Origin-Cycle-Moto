@@ -3,10 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin – Commandes | ORIGINE CYCLE-MOTO</title>
+    <title>Admin | ORIGINE CYCLE-MOTO</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="../css/style.css" rel="stylesheet">
+    <style>
+        .tab-custom { border-bottom: 2px solid rgba(255,60,60,0.3); }
+        .tab-custom .nav-link { color: rgba(255,255,255,0.6); border:none; padding: 12px 24px; font-weight:600; }
+        .tab-custom .nav-link.active { color:#fff; border-bottom: 3px solid #ff3c3c; background:none; }
+        .tab-custom .nav-link:hover { color:#ff3c3c; background:none; }
+        .stat-card { background:rgba(255,60,60,0.08); border:1px solid rgba(255,60,60,0.25); border-radius:12px; padding:18px 24px; }
+        .stat-card h3 { color:#ff3c3c; font-size:2rem; font-weight:800; margin:0; }
+        .stat-card p  { margin:0; font-size:0.85rem; opacity:0.7; }
+        .edit-row input { font-size:0.85rem; }
+        .pwd-field { font-family: monospace; }
+    </style>
 </head>
 <body>
 
@@ -19,7 +30,6 @@
         </a>
         <div class="ms-auto d-flex gap-2 align-items-center">
             <button class="theme-toggle" id="themeToggle"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
-            <!-- nav-user sera injecté par auth.js -->
             <a href="login.html" class="btn text-white ms-1" style="background:none;border:none;" id="nav-user" title="Compte">
                 <i class="bi bi-person-circle fs-5"></i>
             </a>
@@ -29,22 +39,34 @@
 
 <section class="container py-5 mt-5">
 
-    <!-- TABLEAU DES COMMANDES -->
-    <div id="admin-panel">
-        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-            <h2 class="mb-0"><i class="bi bi-list-ul me-2"></i>Toutes les commandes</h2>
-            <div class="d-flex gap-2 align-items-center">
-                <span class="badge bg-secondary fs-6" id="admin-count">0 commande(s)</span>
-                <button class="btn btn-sm btn-outline-light" onclick="exporterCommandes()">
-                    <i class="bi bi-download me-1"></i>Exporter JSON
-                </button>
-            </div>
+    <!-- STATS RAPIDES -->
+    <div class="row g-3 mb-4" id="admin-stats"></div>
+
+    <!-- ONGLETS -->
+    <ul class="nav tab-custom mb-4" id="adminTabs">
+        <li class="nav-item">
+            <button class="nav-link active" onclick="switchTab('commandes', this)">
+                <i class="bi bi-list-ul me-2"></i>Commandes
+                <span class="badge bg-danger ms-1" id="badge-commandes">0</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" onclick="switchTab('clients', this)">
+                <i class="bi bi-people me-2"></i>Clients
+                <span class="badge bg-secondary ms-1" id="badge-clients">0</span>
+            </button>
+        </li>
+    </ul>
+
+    <!-- ═══════════════ ONGLET COMMANDES ═══════════════ -->
+    <div id="tab-commandes">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div class="d-flex flex-wrap gap-2" id="filtres-statut"></div>
+            <button class="btn btn-sm btn-outline-light" onclick="exporterCommandes()">
+                <i class="bi bi-download me-1"></i>Exporter JSON
+            </button>
         </div>
 
-        <!-- FILTRES PAR STATUT -->
-        <div class="d-flex flex-wrap gap-2 mb-4" id="filtres-statut"></div>
-
-        <!-- TABLEAU -->
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead class="table-dark">
@@ -68,7 +90,123 @@
         </p>
     </div>
 
+    <!-- ═══════════════ ONGLET CLIENTS ════════════════ -->
+    <div id="tab-clients" class="d-none">
+
+        <!-- BARRE DE RECHERCHE + AJOUT -->
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div class="input-group" style="max-width:320px;">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="client-search"
+                       placeholder="Rechercher par nom ou email…"
+                       oninput="renderClients()">
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="ouvrirModalAjoutClient()">
+                <i class="bi bi-person-plus me-1"></i>Ajouter un client
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Nom complet</th>
+                        <th>Email</th>
+                        <th>Mot de passe</th>
+                        <th>Commandes</th>
+                        <th style="min-width:200px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="clients-tbody"></tbody>
+            </table>
+        </div>
+        <p id="clients-vide" class="text-center text-muted py-5 d-none">
+            <i class="bi bi-people fs-1 d-block mb-3"></i>Aucun client inscrit pour le moment.
+        </p>
+    </div>
+
 </section>
+
+<!-- ── MODAL MODIFICATION CLIENT ── -->
+<div class="modal fade" id="modalEditClient" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title"><i class="bi bi-pencil-square me-2 text-danger"></i>Modifier le client</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-original-email">
+                <div class="mb-3">
+                    <label class="form-label">Nom complet</label>
+                    <input type="text" class="form-control" id="edit-nom" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="edit-email" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Nouveau mot de passe
+                        <small class="text-muted">(laisser vide = inchangé)</small>
+                    </label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="edit-password" placeholder="••••••••">
+                        <button class="btn btn-outline-secondary" type="button"
+                                onclick="togglePwdVisibility('edit-password', this)">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" onclick="sauverModificationClient()">
+                    <i class="bi bi-save2 me-1"></i>Enregistrer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── MODAL AJOUT CLIENT ── -->
+<div class="modal fade" id="modalAjoutClient" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title"><i class="bi bi-person-plus me-2 text-danger"></i>Ajouter un client</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Nom complet *</label>
+                    <input type="text" class="form-control" id="new-nom" required placeholder="Jean Dupont">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email *</label>
+                    <input type="email" class="form-control" id="new-email" required placeholder="jean@mail.com">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mot de passe *</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="new-password" required placeholder="••••••••" minlength="6">
+                        <button class="btn btn-outline-secondary" type="button"
+                                onclick="togglePwdVisibility('new-password', this)">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="ajout-error" class="alert alert-danger d-none small"></div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" onclick="sauverNouveauClient()">
+                    <i class="bi bi-person-check me-1"></i>Créer le compte
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/config.js"></script>
@@ -77,134 +215,332 @@
 <script src="../js/commandes.js"></script>
 <script src="../js/email.js"></script>
 <script>
-    // Vérification auth admin au chargement (avant le DOMContentLoaded de auth.js)
-    window.addEventListener('load', () => {
-        if (!estConnecte()) {
-            window.location.href = 'login.html';
-            return;
-        }
-        if (!estAdmin()) {
-            alert("Accès refusé. Cette page est réservée à l'administrateur.");
-            window.location.href = '../index.html';
-            return;
-        }
-        renderFiltres();
-        renderCommandes();
+
+// ─── AUTH CHECK ───────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+    if (!estConnecte()) { window.location.href = 'login.html'; return; }
+    if (!estAdmin())    { alert("Accès refusé."); window.location.href = '../index.html'; return; }
+    renderStats();
+    renderFiltres();
+    renderCommandes();
+    renderClients();
+});
+
+// ─── STATS ────────────────────────────────────────────────────────────────────
+function renderStats() {
+    const commandes = getCommandes();
+    const clients   = getClients();
+    const totalCA   = commandes.reduce((s, c) => s + c.total, 0);
+    const enAttente = commandes.filter(c => c.statut === 'En attente').length;
+
+    document.getElementById('admin-stats').innerHTML = `
+        <div class="col-6 col-md-3"><div class="stat-card"><h3>${commandes.length}</h3><p>Commandes totales</p></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card"><h3>${enAttente}</h3><p>En attente</p></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card"><h3>${clients.length}</h3><p>Clients inscrits</p></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card"><h3 style="font-size:1.3rem;">${formatPrix(totalCA)}</h3><p>Chiffre d'affaires</p></div></div>`;
+
+    document.getElementById('badge-commandes').textContent = commandes.length;
+    document.getElementById('badge-clients').textContent   = clients.length;
+}
+
+// ─── ONGLETS ──────────────────────────────────────────────────────────────────
+function switchTab(tab, btn) {
+    document.getElementById('tab-commandes').classList.toggle('d-none', tab !== 'commandes');
+    document.getElementById('tab-clients').classList.toggle('d-none',   tab !== 'clients');
+    document.querySelectorAll('#adminTabs .nav-link').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+// ─── COMMANDES ────────────────────────────────────────────────────────────────
+let filtreActif = '';
+
+function renderFiltres() {
+    const c = document.getElementById('filtres-statut');
+    c.innerHTML = '';
+    const tous = document.createElement('button');
+    tous.className = 'btn btn-sm btn-danger';
+    tous.textContent = 'Tous';
+    tous.onclick = function() { filtrerStatut('', this); };
+    c.appendChild(tous);
+    STATUTS.forEach(s => {
+        const b = document.createElement('button');
+        b.className = 'btn btn-sm btn-outline-light';
+        b.textContent = s;
+        b.onclick = function() { filtrerStatut(s, this); };
+        c.appendChild(b);
     });
+}
 
-    let filtreActif = '';
+function filtrerStatut(statut, btn) {
+    filtreActif = statut;
+    document.querySelectorAll('#filtres-statut .btn').forEach(b => b.className = 'btn btn-sm btn-outline-light');
+    btn.className = 'btn btn-sm btn-danger';
+    renderCommandes();
+}
 
-    function renderFiltres() {
-        const container = document.getElementById('filtres-statut');
-        container.innerHTML = '';
-        const tous = document.createElement('button');
-        tous.className = 'btn btn-sm btn-danger';
-        tous.textContent = 'Tous';
-        tous.onclick = function() { filtrerStatut('', this); };
-        container.appendChild(tous);
+function renderCommandes() {
+    let list = getCommandes();
+    if (filtreActif) list = list.filter(c => c.statut === filtreActif);
+    list.sort((a, b) => new Date(b.dateISO) - new Date(a.dateISO));
 
-        STATUTS.forEach(s => {
-            const btn = document.createElement('button');
-            btn.className = 'btn btn-sm btn-outline-light';
-            btn.textContent = s;
-            btn.onclick = function() { filtrerStatut(s, this); };
-            container.appendChild(btn);
-        });
+    const tbody = document.getElementById('admin-tbody');
+    const vide  = document.getElementById('admin-vide');
+
+    if (!list.length) { tbody.innerHTML = ''; vide.classList.remove('d-none'); return; }
+    vide.classList.add('d-none');
+
+    tbody.innerHTML = list.map(cmd => {
+        const arts    = cmd.articles.map(a => `${a.nom} ×${a.quantite}`).join('<br>');
+        const options = STATUTS.map(s =>
+            `<option value="${s}" ${s === cmd.statut ? 'selected' : ''}>${s}</option>`).join('');
+        return `
+        <tr>
+            <td><code class="text-danger fw-bold">${cmd.numero}</code></td>
+            <td class="small text-muted">${cmd.date}</td>
+            <td>
+                <div class="fw-semibold">${cmd.client.prenom} ${cmd.client.nom}</div>
+                <small class="text-muted">${cmd.client.email}</small>
+            </td>
+            <td class="small">${cmd.client.tel}</td>
+            <td class="small">${cmd.client.ville}</td>
+            <td class="small">${arts}</td>
+            <td class="fw-bold text-danger small">${formatPrix(cmd.total)}</td>
+            <td>${badgeStatut(cmd.statut)}</td>
+            <td>
+                <select class="form-select form-select-sm mb-1" id="sel-${cmd.numero}">${options}</select>
+                <button class="btn btn-danger btn-sm w-100"
+                        onclick="sauvegarderStatut('${cmd.numero}')">
+                    <i class="bi bi-send me-1"></i>Sauver + notifier
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+async function sauvegarderStatut(numero) {
+    const sel = document.getElementById(`sel-${numero}`);
+    if (!sel) return;
+    mettreAJourStatut(numero, sel.value);
+    renderCommandes();
+    renderStats();
+    const commande = getCommandeParNumero(numero);
+    if (commande) {
+        afficherToast(`Statut mis à jour : ${commande.statut}`);
+        await envoyerEmailStatut(commande);
+    }
+}
+
+function exporterCommandes() {
+    const blob = new Blob([JSON.stringify(getCommandes(), null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'commandes-ocm-' + new Date().toISOString().slice(0, 10) + '.json';
+    a.click();
+}
+
+// ─── CLIENTS ──────────────────────────────────────────────────────────────────
+function getClients() {
+    return JSON.parse(localStorage.getItem('ocm_users') || '[]')
+        .filter(u => !u.isAdmin);
+}
+
+function saveClients(allUsers) {
+    localStorage.setItem('ocm_users', JSON.stringify(allUsers));
+}
+
+function renderClients() {
+    const recherche = (document.getElementById('client-search')?.value || '').toLowerCase();
+    let clients = getClients();
+
+    if (recherche) {
+        clients = clients.filter(u =>
+            u.nom.toLowerCase().includes(recherche) ||
+            u.email.toLowerCase().includes(recherche)
+        );
     }
 
-    function filtrerStatut(statut, btn) {
-        filtreActif = statut;
-        document.querySelectorAll('#filtres-statut .btn').forEach(b => {
-            b.className = 'btn btn-sm btn-outline-light';
-        });
-        btn.className = 'btn btn-sm btn-danger';
-        renderCommandes();
+    const tbody = document.getElementById('clients-tbody');
+    const vide  = document.getElementById('clients-vide');
+
+    if (!clients.length) {
+        tbody.innerHTML = '';
+        vide.classList.remove('d-none');
+        renderStats();
+        return;
     }
+    vide.classList.add('d-none');
 
-    function renderCommandes() {
-        let commandes = getCommandes();
-        if (filtreActif) commandes = commandes.filter(c => c.statut === filtreActif);
-        commandes.sort((a, b) => new Date(b.dateISO) - new Date(a.dateISO));
+    // Compte les commandes par client
+    const commandes = getCommandes();
+    const countCmd  = email => commandes.filter(c => c.client.email === email).length;
 
-        const tbody = document.getElementById('admin-tbody');
-        const vide  = document.getElementById('admin-vide');
-        document.getElementById('admin-count').textContent = `${commandes.length} commande(s)`;
-
-        if (!commandes.length) {
-            tbody.innerHTML = '';
-            vide.classList.remove('d-none');
-            return;
-        }
-        vide.classList.add('d-none');
-
-        tbody.innerHTML = commandes.map(cmd => {
-            const articles = cmd.articles.map(a => `${a.nom} ×${a.quantite}`).join('<br>');
-            const options  = STATUTS.map(s =>
-                `<option value="${s}" ${s === cmd.statut ? 'selected' : ''}>${s}</option>`
-            ).join('');
-            return `
-            <tr>
-                <td><code class="text-danger fw-bold">${cmd.numero}</code></td>
-                <td class="small text-muted">${cmd.date}</td>
-                <td>
-                    <div class="fw-semibold">${cmd.client.prenom} ${cmd.client.nom}</div>
-                    <small class="text-muted">${cmd.client.email}</small>
-                </td>
-                <td class="small">${cmd.client.tel}</td>
-                <td class="small">${cmd.client.ville}</td>
-                <td class="small">${articles}</td>
-                <td class="fw-bold text-danger small">${formatPrix(cmd.total)}</td>
-                <td>${badgeStatut(cmd.statut)}</td>
-                <td>
-                    <select class="form-select form-select-sm mb-1" id="sel-${cmd.numero}">
-                        ${options}
-                    </select>
-                    <button class="btn btn-danger btn-sm w-100"
-                            onclick="sauvegarderStatut('${cmd.numero}')">
-                        <i class="bi bi-send me-1"></i>Sauver + notifier
+    tbody.innerHTML = clients.map((u, i) => `
+        <tr>
+            <td class="text-muted small">${i + 1}</td>
+            <td class="fw-semibold">${u.nom}</td>
+            <td>
+                <a href="mailto:${u.email}" class="text-danger text-decoration-none small">${u.email}</a>
+            </td>
+            <td>
+                <div class="input-group input-group-sm" style="max-width:200px;">
+                    <input type="password" class="form-control form-control-sm pwd-field"
+                           value="${u.password}" id="pwd-${i}" readonly>
+                    <button class="btn btn-outline-secondary btn-sm"
+                            onclick="togglePwdVisibility('pwd-${i}', this)" title="Afficher/masquer">
+                        <i class="bi bi-eye"></i>
                     </button>
-                </td>
-            </tr>`;
-        }).join('');
+                </div>
+            </td>
+            <td>
+                <span class="badge bg-secondary">${countCmd(u.email)}</span>
+                ${countCmd(u.email) > 0
+                    ? `<a href="suivi-commande.html" class="small text-danger ms-1" title="Voir commandes">
+                           <i class="bi bi-box-arrow-up-right"></i>
+                       </a>` : ''}
+            </td>
+            <td>
+                <div class="d-flex gap-1 flex-wrap">
+                    <button class="btn btn-sm btn-outline-light"
+                            onclick="ouvrirModalEdit('${u.email}')">
+                        <i class="bi bi-pencil me-1"></i>Modifier
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger"
+                            onclick="supprimerClient('${u.email}', '${u.nom}')">
+                        <i class="bi bi-trash me-1"></i>Supprimer
+                    </button>
+                </div>
+            </td>
+        </tr>`).join('');
+
+    renderStats();
+}
+
+// Ouvre le modal de modification pré-rempli
+function ouvrirModalEdit(email) {
+    const users = JSON.parse(localStorage.getItem('ocm_users') || '[]');
+    const u = users.find(x => x.email === email);
+    if (!u) return;
+    document.getElementById('edit-original-email').value = email;
+    document.getElementById('edit-nom').value   = u.nom;
+    document.getElementById('edit-email').value = u.email;
+    document.getElementById('edit-password').value = '';
+    new bootstrap.Modal(document.getElementById('modalEditClient')).show();
+}
+
+// Sauvegarde les modifications du client
+function sauverModificationClient() {
+    const originalEmail = document.getElementById('edit-original-email').value;
+    const newNom        = document.getElementById('edit-nom').value.trim();
+    const newEmail      = document.getElementById('edit-email').value.trim();
+    const newPassword   = document.getElementById('edit-password').value;
+
+    if (!newNom || !newEmail) { alert('Nom et email obligatoires.'); return; }
+
+    const users = JSON.parse(localStorage.getItem('ocm_users') || '[]');
+    const idx   = users.findIndex(u => u.email === originalEmail);
+    if (idx < 0) return;
+
+    // Vérifie doublon email (sauf si c'est le même)
+    if (newEmail !== originalEmail && users.find(u => u.email === newEmail)) {
+        alert('Cet email est déjà utilisé par un autre compte.');
+        return;
     }
 
-    async function sauvegarderStatut(numero) {
-        const sel = document.getElementById(`sel-${numero}`);
-        if (!sel) return;
-        const nouveauStatut = sel.value;
+    users[idx].nom   = newNom;
+    users[idx].email = newEmail;
+    if (newPassword) users[idx].password = newPassword;
 
-        mettreAJourStatut(numero, nouveauStatut);
-        renderCommandes();
+    saveClients(users);
+    bootstrap.Modal.getInstance(document.getElementById('modalEditClient')).hide();
+    afficherToast(`✓ Client "${newNom}" mis à jour.`);
+    renderClients();
+}
 
-        // Récupère la commande mise à jour et envoie un email au client
-        const commande = getCommandeParNumero(numero);
-        if (commande) {
-            afficherToast(`Statut mis à jour : ${nouveauStatut}`);
-            await envoyerEmailStatut(commande);
-        }
+// Ouvre le modal d'ajout
+function ouvrirModalAjoutClient() {
+    document.getElementById('new-nom').value      = '';
+    document.getElementById('new-email').value    = '';
+    document.getElementById('new-password').value = '';
+    document.getElementById('ajout-error').classList.add('d-none');
+    new bootstrap.Modal(document.getElementById('modalAjoutClient')).show();
+}
+
+// Crée un nouveau compte client (admin)
+function sauverNouveauClient() {
+    const nom      = document.getElementById('new-nom').value.trim();
+    const email    = document.getElementById('new-email').value.trim();
+    const password = document.getElementById('new-password').value;
+    const errDiv   = document.getElementById('ajout-error');
+
+    if (!nom || !email || !password) {
+        errDiv.textContent = 'Tous les champs sont obligatoires.';
+        errDiv.classList.remove('d-none');
+        return;
+    }
+    if (password.length < 6) {
+        errDiv.textContent = 'Le mot de passe doit avoir au moins 6 caractères.';
+        errDiv.classList.remove('d-none');
+        return;
     }
 
-    function exporterCommandes() {
-        const data = JSON.stringify(getCommandes(), null, 2);
-        const blob = new Blob([data], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'commandes-ocm-' + new Date().toISOString().slice(0, 10) + '.json';
-        a.click();
+    const users = JSON.parse(localStorage.getItem('ocm_users') || '[]');
+    if (users.find(u => u.email === email)) {
+        errDiv.textContent = 'Cet email est déjà utilisé.';
+        errDiv.classList.remove('d-none');
+        return;
     }
 
-    // Thème
-    const themeToggle = document.getElementById('themeToggle');
-    const themeIcon   = document.getElementById('themeIcon');
-    const html        = document.documentElement;
-    const savedTheme  = localStorage.getItem('theme');
-    if (savedTheme) { html.setAttribute('data-bs-theme', savedTheme); themeIcon.className = savedTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill'; }
-    themeToggle.addEventListener('click', () => {
-        const t = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
-        html.setAttribute('data-bs-theme', t);
-        localStorage.setItem('theme', t);
-        themeIcon.className = t === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
-    });
+    users.push({ nom, email, password, isAdmin: false });
+    saveClients(users);
+    bootstrap.Modal.getInstance(document.getElementById('modalAjoutClient')).hide();
+    afficherToast(`✓ Client "${nom}" créé avec succès.`);
+    renderClients();
+}
+
+// Supprime un client avec confirmation
+function supprimerClient(email, nom) {
+    const nbCmd = getCommandes().filter(c => c.client.email === email).length;
+    const msg = nbCmd > 0
+        ? `Supprimer le client "${nom}" ?\nAttention : il a ${nbCmd} commande(s) enregistrée(s).`
+        : `Supprimer le client "${nom}" ? Cette action est irréversible.`;
+
+    if (!confirm(msg)) return;
+
+    const users    = JSON.parse(localStorage.getItem('ocm_users') || '[]');
+    const filtered = users.filter(u => u.email !== email);
+    saveClients(filtered);
+    afficherToast(`Client "${nom}" supprimé.`);
+    renderClients();
+}
+
+// Affiche/masque un mot de passe
+function togglePwdVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon  = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+}
+
+// ─── THÈME ────────────────────────────────────────────────────────────────────
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon   = document.getElementById('themeIcon');
+const html        = document.documentElement;
+const savedTheme  = localStorage.getItem('theme');
+if (savedTheme) {
+    html.setAttribute('data-bs-theme', savedTheme);
+    themeIcon.className = savedTheme === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+}
+themeToggle.addEventListener('click', () => {
+    const t = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-bs-theme', t);
+    localStorage.setItem('theme', t);
+    themeIcon.className = t === 'dark' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+});
 </script>
 </body>
 </html>
